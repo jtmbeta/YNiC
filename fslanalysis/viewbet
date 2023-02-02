@@ -1,0 +1,11 @@
+#!/usr/bin/bash
+
+# View bet structural for RNUM / session
+# Usage: ./viewfmap R2268
+
+path="./structural"
+echo $path
+
+fsleyes $path/$1_3_T1 -cm greyscale \
+  $path/$1_3_T1_brain -cm red-yellow &
+

@@ -1,0 +1,11 @@
+#!/usr/bin/bash
+
+# View registration for RNUM / session
+# Usage: ./viewr.sh R2268 1
+
+path="./featout/$1_FMRI$2.feat/reg/"
+echo $path
+
+fsleyes $path/highres \
+  $path/example_func2highres_fast_wmseg -cm blue-lightblue \
+  $path/example_func2highres_fast_wmedge -cm red &
