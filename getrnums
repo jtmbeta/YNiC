@@ -1,0 +1,13 @@
+#!/usr/bin/bash
+# Get all of the  participant R-numbers in the order of
+# scanning and put (clobber) them in ./RNUMBERS.txt
+
+ls -t /mnt/siemensdata/R*/*_P1459/ \
+    | grep -oP "R\d\d\d\d" \
+    | awk '!x[$0]++' \
+    | tac \
+    > RNUMBERS.txt
+
+numr=($(wc -l RNUMBERS.txt))
+echo "Found ${numr[0]} R-numbers and put (clobbered) them in ./RNUMBERS.txt"
+

@@ -1,0 +1,19 @@
+#!/usr/bin/bash
+
+# View contrasts for third-level FEAT analysis
+# Usage: ./viewgcon
+
+path="./featout/$1_FMRI.gfeat"
+echo $path
+
+fsleyes --standard1mm \
+  $path/cope1.feat/stats/zstat1 -un -cm brain_colours_1hot_iso -nc brain_colours_2winter_iso -dr 3 7 \
+  $path/cope2.feat/stats/zstat1 -un -cm brain_colours_1hot_iso -nc brain_colours_2winter_iso -dr 3 7 \
+  $path/cope3.feat/stats/zstat1 -un -cm brain_colours_1hot_iso -nc brain_colours_2winter_iso -dr 3 7 \
+  $path/cope4.feat/stats/zstat1 -un -cm brain_colours_1hot_iso -nc brain_colours_2winter_iso -dr 3 7 \
+  $path/cope5.feat/stats/zstat1 -un -cm brain_colours_1hot_iso -nc brain_colours_2winter_iso -dr 3 7 \
+  $path/cope6.feat/stats/zstat1 -un -cm brain_colours_1hot_iso -nc brain_colours_2winter_iso -dr 3 7 \
+  $path/cope7.feat/stats/zstat1 -un -cm brain_colours_1hot_iso -nc brain_colours_2winter_iso -dr 3 7 \
+  $path/cope8.feat/stats/zstat1 -un -cm brain_colours_1hot_iso -nc brain_colours_2winter_iso -dr 3 7 \
+  $path/cope9.feat/stats/zstat1 -un -cm brain_colours_1hot_iso -nc brain_colours_2winter_iso -dr 3 7 \
+  $path/cope10.feat/stats/zstat1 -un -cm brain_colours_1hot_iso -nc brain_colours_2winter_iso -dr 3 7 &

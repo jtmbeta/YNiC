@@ -1,0 +1,31 @@
+#!/usr/bin/bash
+
+# This script makes a LGN mask from the thomas images
+
+featpath=/scratch/groups/Projects/P1459/jtm/featout
+rnumbers=/scratch/groups/Projects/P1459/jtm/RNUMBERS.txt
+thomasmasks=/scratch/groups/Projects/P1459/jtm/thomasmasks
+
+while read rnum; do
+  echo $rnum
+  rdir=$thomasmasks/$rnum/
+  left=$rdir/left/thomasfull
+  right=$rdir/right/thomasrfull
+  
+  fslmaths -dt int $left -thr 9 -uthr 9 -bin $rdir/left_lgn
+  fslmaths -dt int $right -thr 9 -uthr 9 -bin $rdir/right_lgn
+  fslmaths $rdir/left_lgn -add $rdir/right_lgn $rdir/highres_lgn_thomas
+
+  # Resample to func space
+  flirt -in "$rdir"/lgn \
+    -ref $featpath/"$rnum"_FMRI_1.feat/filtered_func_data.nii.gz \
+    -applyxfm -init "$featpath"/"$rnum"_FMRI_1.feat/reg/highres2example_func.mat \
+    -interp nearestneighbour \
+    -o $rdir/func_lgn_thomas.nii.gz
+
+  for frun in 1 2 3 4; do
+    cp $rdir/func_lgn_thomas.nii.gz \
+      "$featpath"/"$rnum"_FMRI_"$frun".feat/func_lgn_thomas.nii.gz
+  done
+
+done < $rnumbers

@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+
+# Use this script to create individual subject masks via linear 
+# backprojection from standard space. It makes an LGN mask for each subject
+# in highres space, and then another one in functional space (e.g., for fslmeants)
+# Author JTM
+
+set -eu
+
+# Rnumbers
+rnumbers=/scratch/groups/Projects/P1459/jtm/RNUMBERS.txt
+
+# Base directories
+featpath=/scratch/groups/Projects/P1459/jtm/featout
+lgn_loc_dir="$featpath"/group_level_3_StimVsOff_n\=36_3mm.gfeat
+
+# First, make the mask from the functional localiser with 3mm spatial smoothing
+cluster -i "$lgn_loc_dir"/cope1.feat/stats/zstat1 \
+  -t 5 --no_table -o "$lgn_loc_dir"/cluster_index
+
+fslmaths -dt int "$lgn_loc_dir"/cluster_index \
+  -thr 14 -uthr 14 -bin "$lgn_loc_dir"/lgn_mask_right
+
+fslmaths -dt int "$lgn_loc_dir"/cluster_index \
+  -thr 15 -uthr 15 -bin "$lgn_loc_dir"/lgn_mask_left
+
+fslmaths "$lgn_loc_dir"/lgn_mask_right.nii.gz \
+  -add "$lgn_loc_dir"/lgn_mask_left.nii.gz "$lgn_loc_dir"/lgn_mask.nii.gz
+
+# Now, here's the path to the lgn_mask that we just created in standard space
+standard_lgn="$lgn_loc_dir"/lgn_mask.nii.gz
+
+# For each subject, transform the lgn mask back into highres structural space using flirt
+# This requires the standard2highres.mat
+# Also, make a resampled version for the functional images
+while read rnum; do
+  echo "$rnum"
+  # Make lgn mask
+  flirt -in "$standard_lgn" -ref "$featpath"/"$rnum"_FMRI_1.feat/reg/highres.nii.gz \
+    -applyxfm -init "$featpath"/"$rnum"_FMRI_1.feat/reg/standard2highres.mat \
+    -o "$featpath"/"$rnum"_FMRI_1.feat/lgn_mask_highres.nii.gz
+
+  # Rebinaryise
+  fslmaths "$featpath"/"$rnum"_FMRI_1.feat/lgn_mask_highres.nii.gz \
+    -bin "$featpath"/"$rnum"_FMRI_1.feat/lgn_mask_highres_bin.nii.gz  
+
+  # Resample to func space
+  flirt -in "$featpath"/"$rnum"_FMRI_1.feat/lgn_mask_highres_bin.nii.gz \
+    -ref "$featpath"/"$rnum"_FMRI_1.feat/filtered_func_data.nii.gz \
+    -applyxfm -init "$featpath"/"$rnum"_FMRI_1.feat/reg/highres2example_func.mat \
+    -interp nearestneighbour 
+    -o "$featpath"/"$rnum"_FMRI_1.feat/lgn_mask_func_bin.nii.gz
+
+  # Copy to other feat dirs to make things easier if you using featquery
+  for frun in 2 3 4; do
+    cp "$featpath"/"$rnum"_FMRI_1.feat/lgn_mask_highres_bin.nii.gz \
+      "$featpath"/"$rnum"_FMRI_"$frun".feat/lgn_mask_highres_bin.nii.gz
+    cp "$featpath"/"$rnum"_FMRI_1.feat/lgn_mask_func_bin.nii.gz \
+      "$featpath"/"$rnum"_FMRI_"$frun".feat/lgn_mask_func_bin.nii.gz
+  done
+done < "$rnumbers"
+
+

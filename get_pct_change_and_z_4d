@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+# Compute pct change and z-scored functional images
+
+set -eu
+
+featpath=/scratch/groups/Projects/P1459/jtm/featout
+
+while read rnum; do
+  for frun in 1 2 3 4; do
+    #Get the base directory for Rnumber/functional run
+    basedir="$featpath"/"$rnum"_FMRI_"$frun".feat
+    echo "$basedir"
+    # Get the mean time course for the filtered func data. 
+    # I think this already exists in the featdir but I'm making it again 
+    # here anyway.
+    fslmaths "$basedir"/filtered_func_data.nii.gz -Tmean \
+      "$basedir"/filtered_func_data_tmean.nii.gz
+    
+    # Same for standard deviation
+    fslmaths "$basedir"/filtered_func_data.nii.gz -Tstd \
+      "$basedir"/filtered_func_data_tstd.nii.gz
+
+    # Now make a normalised (z-scored) version of the filtered func data
+    fslmaths "$basedir"/filtered_func_data.nii.gz \
+      -sub "$basedir"/filtered_func_data_tmean.nii.gz \
+      -div "$basedir"/filtered_func_data_tstd.nii.gz \
+      "$basedir"/filtered_func_data_z.nii.gz
+
+    # Now for pct signal change from mean
+    fslmaths "$basedir"/filtered_func_data.nii.gz \
+      -sub "$basedir"/filtered_func_data_tmean.nii.gz \
+      -div "$basedir"/filtered_func_data_tmean.nii.gz \
+      -mul 100 \
+      "$basedir"/filtered_func_data_pct.nii.gz 
+  done
+done < RNUMBERS.txt
+

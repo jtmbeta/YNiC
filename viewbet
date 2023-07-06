@@ -1,0 +1,16 @@
+#!/usr/bin/bash
+
+# View structural brain-extraction for RNUM
+# Usage: viewbet R2268
+
+set -eu
+clear
+echo "Attempting to load structural images for $1"
+echo
+path=/scratch/groups/Projects/P1459/jtm/structural
+struct=$path/$1_T1
+struct_brain=$path/$1_T1_brain
+
+fsleyes $struct -cm greyscale \
+  $struct_brain -cm red-yellow &
+

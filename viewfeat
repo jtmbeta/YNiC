@@ -1,0 +1,16 @@
+#!/usr/bin/bash
+
+# View image and timeseries data for a single session in feat mode
+# Usage: ./viewfeat <RNUMBER> <SESSION>
+
+set -eu
+clear
+echo "Attempting to load structural images for $1"
+echo
+path=/scratch/groups/Projects/P1459/jtm/featout/$1_FMRI_$2.feat
+
+fsleyes -s feat \
+  $path/reg/highres_head \
+  $path/reg/example_func2highres --cmap pink --alpha 50 &
+
+

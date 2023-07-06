@@ -1,0 +1,35 @@
+#!/usr/bin/bash
+
+# Perform THOMAS segmentation using cluster
+# Example usage: clusterTHOMAS R2268
+
+# Configure shell to exit upon error
+set -eu
+
+# Define paths
+structural=/scratch/sg9/P1459/jtm/structural
+thomasmasks=/scratch/sg9/P1459/jtm/thomasmasks
+
+
+# Check that the thomasmasks directory exists and make it if it does not
+if [ ! -d "$thomasmasks" ]; then
+  mkdir "$thomasmasks"
+  echo "Made directory: $thomasmasks"
+fi
+
+
+# Loop over R-numbers
+while read rnum; do
+  outdir="$thomasmasks/$rnum"
+  # Check for R-number directory
+  if [ ! -d "$outdir" ]; then
+    mkdir "$outdir"
+    echo "Made directory: $outdir"
+  fi
+
+  # Move to the working directory
+  cd "$outdir"
+  ln -s "${structural}/${rnum}_T1.nii.gz" .
+  thomas_csh_mv "${rnum}"_T1.nii.gz
+done < ../RNUMBERS.txt
+

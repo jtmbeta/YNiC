@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+# Script extracts mean time-course for LGN and MT.
+# Saves timecourses in top level of .feat directory.
+# Author JTM
+
+set -eu
+
+featpath=/scratch/groups/Projects/P1459/jtm/featout
+rnumbers=/scratch/groups/Projects/P1459/jtm/RNUMBERS.txt
+
+while read rnum; do
+  for frun in 1 2 3 4; do
+    base="$featpath"/"$rnum"_FMRI_"$frun".feat
+    echo "$base"
+    fslmeants -i "$base"/filtered_func_data_z.nii.gz \
+      -m "$base"/func_lgn_thomas.nii.gz \
+      -o "$base"/meants_lgn_thomas_z.txt
+
+    fslmeants -i "$base"/filtered_func_data_pct.nii.gz \
+      -m "$base"/func_lgn_thomas.nii.gz \
+      -o "$base"/meants_lgn_thomas_pct.txt
+
+    #fslmeants -i "$base"/filtered_func_data_z.nii.gz \
+    #  -m "$base"/mt_mask_func_bin.nii.gz \
+    #  -o "$base"/meants_mt_z.txt
+
+    #fslmeants -i "$base"/filtered_func_data_pct.nii.gz \
+    #  -m "$base"/mt_mask_func_bin.nii.gz \
+    #  -o "$base"/meants_mt_pct.txt
+  done
+done < "$rnumbers"
+

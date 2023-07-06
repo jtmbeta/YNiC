@@ -1,0 +1,18 @@
+#!/usr/bin/bash
+
+# View the lgn segmentation from thomas
+# Example usage: viewthomas R2268
+
+featpath=/scratch/sg9/P1459/jtm/featout
+thomasmasks=/scratch/sg9/P1459/jtm/thomasmasks
+lgn_thomas_left="$thomasmasks"/"$@"/left/9-LGN.nii.gz
+lgn_thomas_right="$thomasmasks"/"$@"/right/9-LGN.nii.gz
+struct="$featpath"/"${@}"_FMRI_1.feat/reg/highres_head
+lgn_floc="$featpath"/"${@}"_FMRI_1.feat/lgn_mask_highres_bin.nii.gz
+
+#echo "$struct"
+
+fsleyes $struct \
+  $lgn_thomas_right -cm red --alpha 50 \
+  $lgn_thomas_left -cm blue --alpha 50 \
+  $lgn_floc -cm yellow --alpha 50 &

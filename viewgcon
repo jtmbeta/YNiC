@@ -1,0 +1,19 @@
+#!/usr/bin/bash
+
+# View contrasts for third-level FEAT analysis
+# Usage: ./viewgcon
+
+path="/scratch/groups/Projects/P1459/jtm/featout/group_level_3_n=36.gfeat"
+echo $path
+
+fsleyes --standard1mm \
+  $path/cope1.feat/stats/zstat1 -un -cm brain_colours_1hot_iso -nc brain_colours_2winter_iso -dr 3 7 \
+  $path/cope1.feat/stats/zstat2 -un -cm brain_colours_1hot_iso -nc brain_colours_2winter_iso -dr 3 7 \
+  $path/cope1.feat/stats/zstat3 -un -cm brain_colours_1hot_iso -nc brain_colours_2winter_iso -dr 3 7 \
+  $path/cope1.feat/stats/zstat4 -un -cm brain_colours_1hot_iso -nc brain_colours_2winter_iso -dr 3 7 \
+  $path/cope1.feat/stats/zstat5 -un -cm brain_colours_1hot_iso -nc brain_colours_2winter_iso -dr 3 7 \
+  $path/cope1.feat/stats/zstat6 -un -cm brain_colours_1hot_iso -nc brain_colours_2winter_iso -dr 3 7 \
+  $path/cope1.feat/stats/zstat7 -un -cm brain_colours_1hot_iso -nc brain_colours_2winter_iso -dr 3 7 \
+  $path/cope1.feat/stats/zstat8 -un -cm brain_colours_1hot_iso -nc brain_colours_2winter_iso -dr 3 7 \
+  $path/cope1.feat/stats/zstat9 -un -cm brain_colours_1hot_iso -nc brain_colours_2winter_iso -dr 3 7 \
+  $path/cope1.feat/stats/zstat10 -un -cm brain_colours_1hot_iso -nc brain_colours_2winter_iso -dr 3 7 &
