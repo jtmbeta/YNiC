@@ -1,0 +1,11 @@
+#!/usr/bin/bash
+
+# View registration for RNUM / session
+# Usage: ./viewfmap R2268
+
+path="../fieldmaps"
+echo $path
+
+fsleyes $path/$1_FMAP_MAG -cm greyscale \
+  $path/$1_FMAP_MAG_brain -cm red-yellow \
+  $path/$1_FMAP_MAG_brain_ero -cm blue-lightblue &
