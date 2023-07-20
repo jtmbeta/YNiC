@@ -4,6 +4,13 @@
 Created on Mon Jul  3 09:43:16 2023
 
 @author: jtm545
+
+Script to prepare the gradient fieldmaps for B0 unwarping in the FSL pipeline.
+Follow this link for more information on the process:
+    
+https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FUGUE/Guide#Making_Fieldmap_Images_for_FEAT
+
+
 """
 
 import os
@@ -18,7 +25,7 @@ import errno
 with open('../RNUMBERS.txt', 'r') as f:
     RNUMBERS = f.read().splitlines()
 
-RNUMBERS = ['R6281']
+RNUMBERS = ['R4176']
     
 # YNiC project ID
 PROJECT = 'P1470'
@@ -27,7 +34,7 @@ PROJECT = 'P1470'
 EXT = '.nii.gz'
 
 # Override
-RNUMBERS = ['R6152', 'R4176']
+RNUMBERS = ['R6128']
 
 #%% A useful function
     
@@ -102,5 +109,4 @@ for rnum in RNUMBERS:
         cmd = (('fsl_prepare_fieldmap SIEMENS {o}/{r}_FMAP_PHASE ' 
                '{o}/{r}_FMAP_MAG_brain_ero {o}/{r}_FMAP_RADS 2.46')
         .format(o=fieldmap_dir, r=rnum))
-        #print('!{}'.format(cmd))
         os.system(cmd)    

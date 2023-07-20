@@ -4,6 +4,9 @@
 Created on Mon Jul  3 10:27:54 2023
 
 @author: jtm545
+
+Script to retrieve the functional data for each subject. The files are 
+symlinked into the fmnri folder. 
 """
 
 import os
@@ -25,7 +28,7 @@ PROJECT = 'P1470'
 EXT = '.nii.gz'
 
 # Override
-#RNUMBERS = ['R6152', 'R4176']
+#RNUMBERS = []
 
 #%% A useful function
     

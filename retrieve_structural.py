@@ -4,20 +4,22 @@
 Created on Mon Jul  3 09:45:50 2023
 
 @author: jtm545
+
+This script finds all of the structural images for a list of R-numbers and
+symlinks them into the structural folder. It also runs the FSL brain extraction
+tool on each structural image with default settings and saves the output in the 
+same folder with the _brain.nii.gz suffix. If default brain extraction does not
+yield good results, it should be done separately (-f and -g parameters can be)
+played with to find optimal results.
+
+
 """
 
-import sys
 import os
 import os.path as op
-import pathlib
 import errno
 import glob
 import re
-import json
-
-import scipy.io as scipyio
-import pandas as pd
-import numpy as np
 
   
 # R numbers
@@ -31,8 +33,7 @@ PROJECT = 'P1470'
 EXT = '.nii.gz'
 
 # Override
-RNUMBERS = ['R6152', 'R4176']
-
+RNUMBERS = ['R6128', 'R6307']
 
 #%% A useful function
     
@@ -59,6 +60,8 @@ def force_symlink(file, target):
 
 def sort_structural(f):
     '''Sort the structural files so we can select the highest number'''
+    # Use fancy regex 'lookahead' pattern to extract number in T1 filepath
+    # (we want the highest number)
     num = int(re.findall(r'\d+(?=_T1)', f)[0])
     return num
     
@@ -70,9 +73,12 @@ if not op.exists(structural_dir):
 
 print("--------- Structural ---------")
 
+# Loop over R-numbers
 for rnum in RNUMBERS:
     
-    # These if statements find the most recent structural image for the subject
+    # Most of the participants in P1470 have existing structural scans. These
+    # if statements find the relevant stru ctural image from an alternative 
+    # project directory.
     if rnum == 'R4197':
         pattern = '/mnt/siemensdata/{}/*P1459/*.nii.gz'.format(rnum)
     elif rnum == 'R3154':
@@ -87,17 +93,32 @@ for rnum in RNUMBERS:
         pattern = '/mnt/siemensdata/{}/*P1459/*.nii.gz'.format(rnum)
     elif rnum == 'R4176':
         pattern = '/mnt/siemensdata/{}/*P1322/*.nii.gz'.format(rnum)
+    elif rnum == 'R5619':
+        pattern = '/mnt/siemensdata/{}/*P1459/*.nii.gz'.format(rnum)
+    elif rnum == 'R5621':
+        pattern = '/mnt/siemensdata/{}/*P1353/*.nii.gz'.format(rnum)
+    elif rnum == 'R6128':
+        pattern = '/mnt/siemensdata/{}/*/*T1*.nii.gz'.format(rnum)
+    elif rnum == 'R6307':
+        pattern = '/mnt/siemensdata/{}/*/*T1*.nii.gz'.format(rnum)
     else:
         pattern = '/mnt/siemensdata/{}/*{}/*.nii.gz'.format(rnum, PROJECT)
-        
+    
+    # List of matching files     
     files = [f for f in glob.glob(pattern)]
+    
+    # Filter the filelist (we only want T1)
     struct = [f for f in files if 'T1' in f]
+    
+    # Get the desired file
     struct.sort(key=sort_structural)
     f = struct[-1]
+    
+    # Create symlink
     target = '{o}/{r}_T1.nii.gz'.format(o=structural_dir, r=rnum)
     force_symlink(f, target)
     
-    # Run BET with default params (for now) on T1 structural image
+    # Run BET with default params on T1 structural image
     bet_output = target.replace(EXT, '') + '_brain' + EXT
     cmd = 'bet {} {}'.format(target, bet_output)
     print('!{}'.format(cmd))

@@ -4,42 +4,33 @@
 Created on Mon Jul  3 09:44:58 2023
 
 @author: jtm545
+
+Script to prepare the event files in the correct format for FSL analysis.
+
 """
 
-import sys
 import os
 import os.path as op
-import pathlib
 import errno
-import glob
-import re
 import json
 
-import scipy.io as scipyio
 import pandas as pd
 import numpy as np
 
-
-
-#LOGFILE = True
-#if LOGFILE:
-#    if op.exists('logfile.txt'):
-#        os.remove('logfile.txt')
-#    sys.stdout = open('logfile.txt', 'w')
-    
+  
 # R numbers
 with open('../RNUMBERS.txt', 'r') as f:
     RNUMBERS = f.read().splitlines()
 
+
 # Override
-RNUMBERS = ['R6152', 'R4176']
+RNUMBERS = ['R6307']
 
 # YNiC project ID
 PROJECT = 'P1470'
 
 # Image file extension
 EXT = '.nii.gz'
-
 
 # Melanopsin condition mapping
 mel_conds = {
@@ -82,9 +73,6 @@ def force_symlink(file, target):
 
 
 #%% Prepare EV files (onset, duration, weighting)
-# This is experiment-specific stuff to extract the event info from the .mat
-# files produced by the psyctoolbox script and turn them into three-column EV
-# files for FSL.
 
 # Results from the psychtoolbox script are saved here
 exptdir = '/groups/Projects/P1470/Subjects'
@@ -97,7 +85,7 @@ if not op.exists(eventfile_dir):
 # Loop over R numbers
 for rnum in RNUMBERS:
     
-    # New folder for RNUMBER
+    # New folder for RNUMBER in the eventfiles directory
     R_event_dir = op.join(eventfile_dir, rnum)
     if not op.exists(R_event_dir):
         os.mkdir(R_event_dir)
@@ -106,9 +94,10 @@ for rnum in RNUMBERS:
     with open(op.join(exptdir, rnum, 'rinfo.json')) as fh:
         rinfo = json.load(fh)
     
-    # Process the times for each block
+    # Process the times for each functional run
     for block in [1, 2, 3, 4]:
         
+        # Load the events.csv data
         df = pd.read_csv(op.join(exptdir, rnum, f'00{block}', 'events.csv'))
         
         # New condition codes
@@ -126,12 +115,13 @@ for rnum in RNUMBERS:
         # Add corrected onsets to DF
         df['Corrected_onset'] = df.Onset.add(delta)
         
+        # Update the conditions
         if df.Event.str.contains('MEL').any():
             df['Condition'] = df.Event.map(mel_conds)
         else:
             df['Condition'] = df.Event.map(lms_conds)
         
-        # Just what we are interseted in for now
+        # Just keep what we are interested in
         stim_info = df.loc[~df.Condition.isna(), :]
              
         # Weights are set to 1 for fsl EV files
@@ -140,7 +130,7 @@ for rnum in RNUMBERS:
         # Save EV file for each stimulus type
         out_dir = op.join(eventfile_dir, rnum)
         
-        # Make event files
+        # Make event files for each condition/block
         for c in stim_info.Condition.unique():
             ev_fname = (
                     '{o}/{r}_conditions_block{b}_{con}.txt'
