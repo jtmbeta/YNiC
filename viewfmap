@@ -3,7 +3,7 @@
 # View registration for RNUM / session
 # Usage: ./viewfmap R2268
 
-path="../fieldmaps"
+path="/scratch/groups/Projects/P1470/fsl/fieldmaps"
 echo $path
 
 fsleyes $path/$1_FMAP_MAG -cm greyscale \

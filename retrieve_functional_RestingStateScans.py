@@ -4,6 +4,7 @@
 Created on Mon Jul  3 10:27:54 2023
 
 @author: jtm545
+Edited by LEW to retrieve the Resting State Scans
 
 Script to retrieve the functional data for each subject. The files are 
 symlinked into the fmnri folder. 
@@ -18,7 +19,7 @@ import glob
 
 #%%
 # R numbers
-with open('../RNUMBERS.txt', 'r') as f:
+with open('RNUMBERS_RestingState.txt', 'r') as f:
     RNUMBERS = f.read().splitlines()
     
 # YNiC project ID
@@ -28,7 +29,7 @@ PROJECT = 'P1470'
 EXT = '.nii.gz'
 
 # Override
-RNUMBERS = ['R6307']
+#RNUMBERS = ['R6307']
 
 #%% A useful function
     
@@ -77,20 +78,38 @@ print("--------- Functional ---------")
 
     
 for rnum in RNUMBERS:
-    pattern = '/mnt/siemensdata/{}/*{}/*FMRI**.nii.gz'.format(rnum, PROJECT)
+    pattern = '/mnt/siemensdata/{}/*{}/*RESTINGSTATE1**.nii.gz'.format(rnum, PROJECT)
     fmri_files = glob.glob(pattern)
-    fmri_files.sort(key=func_sort)
+  #  fmri_files.sort(key=func_sort)
     print(fmri_files)
     
     # Sometimes there can be extra fMRI files that we don't need. These are
     # usually 'false starts' and can be recognised by having a smaller size.
     # We remove them here.
-    if rnum=='R6269':
-        fmri_files.remove('/mnt/siemensdata/R6269/20230601130701_P1470/7_FMRI3_XPQ124.nii.gz')
+  #  if rnum=='R6269':
+   #     fmri_files.remove('/mnt/siemensdata/R6269/20230601130701_P1470/7_FMRI3_XPQ124.nii.gz')
     
     for run, f in enumerate(fmri_files[-4:]):            
         #frun = re.search('(?<=FMRI)\d', f).group()
-        target = '{o}/{r}_FMRI_{run}.nii.gz'.format(
-                o=fmri_dir, r=rnum, run=run+1)
+        target = '{o}/{r}_RESTINGSTATE1.nii.gz'.format(
+                o=fmri_dir, r=rnum)
         force_symlink(f, target)
         
+
+for rnum in RNUMBERS:
+    pattern = '/mnt/siemensdata/{}/*{}/*RESTINGSTATE2**.nii.gz'.format(rnum, PROJECT)
+    fmri_files = glob.glob(pattern)
+   # fmri_files.sort(key=func_sort)
+    print(fmri_files)
+    
+    # Sometimes there can be extra fMRI files that we don't need. These are
+    # usually 'false starts' and can be recognised by having a smaller size.
+    # We remove them here.
+#    if rnum=='R6269':
+ #       fmri_files.remove('/mnt/siemensdata/R6269/20230601130701_P1470/7_FMRI3_XPQ124.nii.gz')
+    
+    for run, f in enumerate(fmri_files[-4:]):            
+        #frun = re.search('(?<=FMRI)\d', f).group()
+        target = '{o}/{r}_RESTINGSTATE2.nii.gz'.format(
+                o=fmri_dir, r=rnum)
+        force_symlink(f, target)

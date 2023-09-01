@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# Run the fsl_invwarp script on the cluster for all R-numbers and functional runs
+
+# Rnumbers
+rnumbers=/scratch/groups/Projects/P1470/fsl/RNUMBERS.txt
+
+while read rnum; do
+  for frun in {1..4}; do
+    echo $rnum
+    echo $frun
+    # Modify the script in place
+    sed -i -E "s/R[0-9]{4}_FMRI_[0-9]/${rnum}_FMRI_${frun}/g" fsl_invwarp
+    qsub -j y fsl_invwarp
+  done
+done < "$rnumbers"

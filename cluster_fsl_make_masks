@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+# Rnumbers
+rnumbers=/scratch/groups/Projects/P1470/fsl/RNUMBERS.txt
+
+# Base directories
+featdir=/scratch/groups/Projects/P1470/fsl/featout
+
+while read rnum; do
+  for frun in {1..4}; do
+    echo $rnum
+    echo $frun
+    fpath="$featdir"/"$rnum"
+    sed -i.bak -E "s/R[0-9]{4}_FMRI_[0-9]/${rnum}_FMRI_${frun}/g" fsl_make_masks
+    qsub -j y fsl_make_masks
+  done
+done < "$rnumbers"

@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+
+# Use this script to create individual subject masks via linear 
+# backprojection from standard space. Here, we are backprojecting the ROIs
+# from Schoonderwoerd et al. (2022) into highres space, and then another one 
+# in functional space (e.g., for fslmeants). The result is that every first-level
+# scan directory will have a SCN, CSF and V1 binary mask.
+# NOTE: draw masks in the right space!
+# Author JTM
+
+set -eu
+
+# Rnumbers
+rnumbers=/scratch/groups/Projects/P1470/fsl/RNUMBERS.txt
+
+# Base directories
+featdir=/scratch/groups/Projects/P1470/fsl/featout/R6307_FMRI_4.feat
+maskdir=/scratch/groups/Projects/P1470/fsl/MNI152_masks
+
+echo
+
+for ROI in SCN V1 CSF; do
+  mask="$maskdir"/MNI152_1mm_"$ROI".nii.gz
+  echo "Warping ${ROI} mask from standard to functional space"
+  # Convert from standard to functional
+  applywarp \
+    -r "$featdir"/example_func.nii.gz \
+    -i "$mask" \
+    -w "$featdir"/reg/highres2standard_warp_inv \
+    --postmat="$featdir"/reg/highres2example_func.mat \
+    -o "$featdir"/"$ROI"_mask_func_bin
+
+  # Rebinaryise
+  fslmaths "$featdir"/"$ROI"_mask_func_bin \
+    -thr 0.5 -bin "$featdir"/"$ROI"_mask_func_bin
+
+  echo "Warping ${ROI} mask from standard to highres space"
+  # Convert from standard to functional
+  applywarp \
+    -r "$featdir"/reg/highres.nii.gz \
+    -i "$mask" \
+    -w "$featdir"/reg/highres2standard_warp_inv \
+    -o "$featdir"/"$ROI"_mask_highres_bin
+
+  # Rebinaryise
+  fslmaths "$featdir"/"$ROI"_mask_highres_bin \
+    -thr 0.5 -bin "$featdir"/"$ROI"_mask_highres_bin
+
+done

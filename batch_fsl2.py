@@ -34,7 +34,7 @@ with open('../RNUMBERS.txt', 'r') as f:
     RNUMBERS = f.read().splitlines()
 
 # Override
-#RNUMBERS = ['R4176']
+#RNUMBERS = ['R6307']
 
 # The four functional runs
 FUNCTIONALRUN = ['1', '2', '3', '4']

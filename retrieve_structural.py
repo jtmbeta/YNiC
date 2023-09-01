@@ -33,7 +33,7 @@ PROJECT = 'P1470'
 EXT = '.nii.gz'
 
 # Override
-RNUMBERS = ['R6128', 'R6307']
+RNUMBERS = ['R6307']
 
 #%% A useful function
     

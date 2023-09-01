@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+# This is the invwarp command for a single subject/scan.
+# It creates a standard2highres_warp volume that is needed when warping 
+# masks back from standard to highres space.
+# Run the cluster_invwarp script to perform it for all subjects/scans in parallel.
+# Author: JTM
+# Date: 30/08/1988
+
+#invwarp \
+#  -w /scratch/groups/Projects/P1470/fsl/featout/R6307_FMRI_3.feat/reg/highres2standard_warp.nii.gz \
+#  -o /scratch/groups/Projects/P1470/fsl/featout/R6307_FMRI_3.feat/reg/standard2highres_warp.nii.gz \
+#  -r /scratch/groups/Projects/P1470/fsl/featout/R6307_FMRI_3.feat/reg/highres.nii.gz
+
+invwarp \
+  --ref=/scratch/groups/Projects/P1470/fsl/featout/R6307_FMRI_3.feat/reg/highres \
+  --warp=/scratch/groups/Projects/P1470/fsl/featout/R6307_FMRI_3.feat/reg/highres2standard_warp \
+  --out=/scratch/groups/Projects/P1470/fsl/featout/R6307_FMRI_3.feat/reg/highres2standard_warp_inv

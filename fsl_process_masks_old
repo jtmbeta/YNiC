@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+
+# Use this script to create individual subject masks via linear 
+# backprojection from standard space. Here, we are backprojecting the ROIs
+# from Schoonderwoerd et al. (2022) into highres space, and then another one 
+# in functional space (e.g., for fslmeants). The result is that every first-level
+# scan directory will have a SCN, CSF and V1 binary mask.
+# NOTE: draw masks in the right space!
+# Author JTM
+
+set -eu
+
+# Rnumbers
+rnumbers=/scratch/groups/Projects/P1470/fsl/RNUMBERS.txt
+
+# Base directories
+featdir=/scratch/groups/Projects/P1470/fsl/featout
+groupdir="$featdir"/Group_level_n=18.gfeat
+
+# For each subject, transform the mask back into highres structural space using flirt
+# This requires the standard2highres.mat
+# Also, make a resampled version for the functional images
+while read rnum; do
+  echo "$rnum"
+  for ROI in SCN CSF V1; do
+    mask=$groupdir/MNI152_1mm_"$ROI".nii.gz
+    echo "$mask"
+    ###--- Linear registration ---###
+    # Make mask
+    #flirt -in "$mask" -ref "$featdir"/"$rnum"_FMRI_1.feat/reg/highres.nii.gz \
+    #  -applyxfm -init "$featdir"/"$rnum"_FMRI_1.feat/reg/standard2highres.mat \
+    #  -o "$featdir"/"$rnum"_FMRI_1.feat/"$ROI"_mask_highres.nii.gz
+
+    # Rebinaryise
+    #fslmaths "$featdir"/"$rnum"_FMRI_1.feat/"$ROI"_mask_highres.nii.gz \
+    #  -bin "$featdir"/"$rnum"_FMRI_1.feat/"$ROI"_mask_highres_bin.nii.gz  
+
+    # Resample to func space
+    #flirt -in "$featdir"/"$rnum"_FMRI_1.feat/"$ROI"_mask_highres_bin.nii.gz \
+    #  -ref "$featdir"/"$rnum"_FMRI_1.feat/filtered_func_data.nii.gz \
+    #  -applyxfm -init "$featdir"/"$rnum"_FMRI_1.feat/reg/highres2example_func.mat \
+    #  -interp nearestneighbour \
+    #  -o "$featdir"/"$rnum"_FMRI_1.feat/"$ROI"_mask_func_bin.nii.gz
+
+    ###--- Nonlinear registration ---###
+   
+    # Applywarps
+
+    #invwarp --ref="$featdir"/"$rnum"_FMRI_1.feat/reg/highres \
+    #  --warp="$featdir"/"$rnum"_FMRI_1.feat/reg/highres2standard_warp \
+    #  --out="$featdir"/"$rnum"_FMRI_1.feat/reg/highres2standard_warp_inv
+
+    #applywarp -i "$mask" -o "$featdir"/"$rnum"_FMRI_1.feat/"$ROI"_mask_highres.nii.gz \
+    #  -r "$featdir"/"$rnum"_FMRI_1.feat/reg/highres.nii.gz \
+    #  -w "$featdir"/"$rnum"_FMRI_1.feat/reg/standard2highres_warp.nii.gz 
+
+    # Rebinaryise
+    #fslmaths "$featdir"/"$rnum"_FMRI_1.feat/"$ROI"_mask_highres.nii.gz -thr 0.9 \
+    #  -bin "$featdir"/"$rnum"_FMRI_1.feat/"$ROI"_mask_highres_bin.nii.gz
+
+    # Resample to func space
+    #flirt -in "$featdir"/"$rnum"_FMRI_1.feat/"$ROI"_mask_highres_bin.nii.gz \
+    #  -ref "$featdir"/"$rnum"_FMRI_1.feat/filtered_func_data.nii.gz \
+    #  -applyxfm -init "$featdir"/"$rnum"_FMRI_1.feat/reg/highres2example_func.mat \
+    #  -interp nearestneighbour \
+    #  -o "$featdir"/"$rnum"_FMRI_1.feat/"$ROI"_mask_func_bin.nii.gz
+    
+    # Convert from standard to functional
+    applywarp \
+      -r "$featdir"/"$rnum"_FMRI_1.feat/example_func.nii.gz \
+      -i "$mask" \
+      -w "$featdir"/"$rnum"_FMRI_1.feat/reg/highres2standard_warp_inv \
+      --postmat="$featdir"/"$rnum"_FMRI_1.feat/reg/highres2example_func.mat \
+      -o "$featdir"/"$rnum"_FMRI_1.feat/"$ROI"_mask_func_bin
+    
+    # Rebinaryise
+    fslmaths "$featdir"/"$rnum"_FMRI_1.feat/"$ROI"_mask_func_bin \
+      -thr 0.5 -bin "$featdir"/"$rnum"_FMRI_1.feat/"$ROI"_mask_func_bin
+
+    # Copy to other feat dirs to make things easier if you using featquery
+    for frun in 2 3 4; do
+      echo $frun
+      #cp "$featdir"/"$rnum"_FMRI_1.feat/"$ROI"_mask_highres_bin.nii.gz \
+      #  "$featdir"/"$rnum"_FMRI_"$frun".feat/"$ROI"_mask_highres_bin.nii.gz
+      cp "$featdir"/"$rnum"_FMRI_1.feat/"$ROI"_mask_func_bin.nii.gz \
+        "$featdir"/"$rnum"_FMRI_"$frun".feat/"$ROI"_mask_func_bin.nii.gz
+    done
+  done
+done < "$rnumbers"

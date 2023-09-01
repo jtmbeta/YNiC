@@ -19,8 +19,8 @@ import numpy as np
 
 
 # Be sure to set these values appropriately.
-NCONTRASTS = 4  # The number of contrasts specified in the featsetup file(s).
-NSUBJECTS = 17  # The number of subjects in the third-level analysis.
+NCONTRASTS = 6  # The number of contrasts specified in the featsetup file(s).
+NSUBJECTS = 18  # The number of subjects in the third-level analysis.
 
 # Create the design matrix.
 evs = np.tile(np.eye(NCONTRASTS, dtype=int), (NSUBJECTS, 1))

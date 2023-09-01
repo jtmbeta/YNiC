@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+# Feat directory
+featdir=/scratch/groups/Projects/P1470/fsl/featout/R6307_FMRI_4.feat
+
+# Get mean timecourse 
+fslmaths "$featdir"/filtered_func_data.nii.gz -Tmean \
+  "$featdir"/filtered_func_data_tmean.nii.gz
+
+# Now for pct signal change from mean
+fslmaths "$featdir"/filtered_func_data.nii.gz \
+  -sub "$featdir"/filtered_func_data_tmean.nii.gz \
+  -div "$featdir"/filtered_func_data_tmean.nii.gz \
+  -mul 100 \
+  "$featdir"/filtered_func_data_pct.nii.gz
+
+for ROI in SCN V1 CSF; do
+  
+  # Get the timecourse
+  fslmeants -i "$featdir"/filtered_func_data_pct.nii.gz \
+    -m "$featdir"/"$ROI"_mask_func_bin.nii.gz \
+    -o "$featdir"/"$ROI"_meants.txt
+
+done

@@ -1,0 +1,13 @@
+#!/usr/bin/bash
+
+# View Schoonderwoerd masks in MNI space
+# Usage: ./viewmasks
+
+path="/scratch/groups/Projects/P1470/fsl/featout/Group_level_n=18.gfeat"
+echo $path
+
+fsleyes --standard1mm \
+  $path/MNI152_1mm_SCN -un -cm yellow \
+  $path/MNI152_1mm_CSF -un -cm red \
+  $path/MNI152_1mm_V1 -un -cm blue 
+

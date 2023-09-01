@@ -16,15 +16,34 @@ square for every job that was submitted. The full analysis (registration and
 stats) can take a few hours to run but if only running stats it shyouldn't take
 too long.
 
+21/07/2023 (JTM) - We want to re-run the analysis without using BET on the fMRI 
+images in case it is removing areas of the brain that we are interested in, so
+I have added a few global options at the top of the script to allow this. Much
+easier than manually modifying the fsf files. 
+
 """
 
 import os
 import os.path as op
 import re
 
+# FEAT options
+# Some useful top-level options to include are B0 unwarping, BET, analysis
+# level, etc.
+
+# Whether to run BET on fMRI data
+FMRI_BET = 1
+# Escape braclets!
+
 
 # Set to False to run the full analysis, including registration
 ONLYSTATS = False
+
+# FEAT options
+# If running an analysis with different options, add the following suffix
+# to the feat directory so you can keep track
+OUT_DIR_SUFFIX = ''  # Append this to the name of the feat dir
+
 
 # Save the temporary design files here
 FSFDIR = '/scratch/groups/Projects/P1470/fsl/fsfs'
@@ -36,16 +55,15 @@ with open('../RNUMBERS.txt', 'r') as f:
     RNUMBERS = f.read().splitlines()
 
 # Override
-#RNUMBERS = ['R4176']
+#RNUMBERS = ['R6273', 'R6281', 'R4176']
 
 # The four functional runs
 FUNCTIONALRUN = ['1', '2', '3', '4']
 
 # Loop over rnumbers.
 for rnum in RNUMBERS:
-    
     # Rnumbers with fieldmaps can include B0 unwarping
-    if ONLYSTATS:
+    if ONLYSTATS:  # But not when only running stats
         LMS_DESIGN_FILE = '/scratch/groups/Projects/P1470/fsl/featsetup/R3154_level_1_LMS_stats.fsf'
         MEL_DESIGN_FILE = '/scratch/groups/Projects/P1470/fsl/featsetup/R3154_level_1_MEL_stats.fsf' 
     else:
@@ -56,7 +74,7 @@ for rnum in RNUMBERS:
     if rnum in ['R6273', 'R6281', 'R4176'] and not ONLYSTATS:
         LMS_DESIGN_FILE = '/scratch/groups/Projects/P1470/fsl/featsetup/R3154_level_1_LMS_no_B0.fsf'
         MEL_DESIGN_FILE = '/scratch/groups/Projects/P1470/fsl/featsetup/R3154_level_1_MEL_no_B0.fsf' 
-        
+    
     # Loop over functional runs.
     for frun in FUNCTIONALRUN:
         
@@ -89,7 +107,29 @@ for rnum in RNUMBERS:
         
         # Substitute event file block number
         content_new = re.sub('block\d', 'block' + frun, content_new, flags=re.M)
+        
+        # -------------------- Set top level Feat options ------------------- #
+        
+        
+        # Whether to run BET on fMRI data
+        content_new = re.sub(
+                    'set\sfmri\(bet_yn\)\s\d', 
+                    f'set fmri(bet_yn) {FMRI_BET}', 
+                    content_new, flags=re.M
+                    )
+                
+        # Append a suffix to the output directory if required
+        if OUT_DIR_SUFFIX:
+            content_new = re.sub(
+                    'featout/R\d\d\d\d_FMRI_\d',
+                    "featout/{}_FMRI_{}{}".format(rnum, frun, OUT_DIR_SUFFIX), 
+                    content_new, flags=re.M
+                    )
 
+        # Set
+        #if not FMRI_BET:
+        #    content_new = content_new.replace('set fmri(bet_yn) 1', 'set fmri(bet_yn) 0')
+        
         # Write out new fsf file
         fname = op.join(FSFDIR, f'tmp_{rnum}_{frun}.fsf')
         with open(fname, 'w') as f:
