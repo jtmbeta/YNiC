@@ -1,11 +1,11 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
+
 # Get all of the  participant R-numbers in the order of
 # scanning and put (clobber) them in ./RNUMBERS.txt
 # Sort by most recent with -t
 # Perl-compatible only matching regex
 # Remove duplicates (in case of many structurals)
 # Concatenate and print in reverse
-# Clobber
 
 ls -t /mnt/siemensdata/R*/*_P1470/ | grep -oP "R\d\d\d\d" | awk '!x[$0]++' | tac > ../RNUMBERS.txt 
 

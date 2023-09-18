@@ -11,7 +11,7 @@ while read rnum; do
     echo $rnum
     echo $frun
     fpath="$featdir"/"$rnum"
-    sed -i.bak -E "s/R[0-9]{4}_FMRI_[0-9]/${rnum}_FMRI_${frun}/g" fsl_make_masks
-    qsub -j y fsl_make_masks
+    sed -i -E "s/R[0-9]{4}_FMRI_[0-9]/${rnum}_FMRI_${frun}/g" fsl_make_masks
+    qsub -j y -o /scratch/home/j/jtm545/logs fsl_make_masks
   done
 done < "$rnumbers"

@@ -8,8 +8,10 @@ while read rnum; do
     echo $rnum
     echo $frun
     # Modify the script
-    sed -i -E "s/R[0-9]{4}_FMRI_[0-9]/${rnum}_FMRI_${frun}/g" fsl_get_mask_ts
+    sed -i -E "s/R[0-9]{4}/${rnum}/g" fsl_resample_benson_v1
+    sed -i -E "s/FMRI_[0-9]/FMRI_${frun}/g" fsl_resample_benson_v1
+
     # Send to cluster
-    qsub -j y -o /scratch/home/j/jtm545/logs fsl_get_mask_ts
+    qsub -j y -o /scratch/home/j/jtm545/logs fsl_resample_benson_v1
   done
 done < "$rnumbers"

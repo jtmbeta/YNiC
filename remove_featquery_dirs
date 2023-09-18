@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+# Remove all of the featquery directories
+
+# File with the directoreies
+featcopes=/scratch/groups/Projects/P1470/fsl/featquerycopes.txt
+
+while read dir; do
+  rm -dR $dir/featquery*
+done < "$featcopes"

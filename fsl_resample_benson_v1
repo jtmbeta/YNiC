@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+# Resample
+flirt \
+  -in /scratch/groups/Projects/P1470/BensonV1NiftiROIs/subR6307_BensonV1stimArea_20230901T121327.nii.gz \
+  -ref /scratch/groups/Projects/P1470/fsl/featout/R6307_FMRI_4.feat/reg/highres.nii.gz \
+  -applyxfm -usesqform \
+  -out /scratch/groups/Projects/P1470/fsl/featout/R6307_FMRI_4.feat/BensonV1.nii.gz
+
+# Rebinaryise
+fslmaths /scratch/groups/Projects/P1470/fsl/featout/R6307_FMRI_4.feat/BensonV1.nii.gz \
+  -thr 0.5 -bin /scratch/groups/Projects/P1470/fsl/featout/R6307_FMRI_4.feat/BensonV1.nii.gz
+
+# Resample to func space
+flirt -in /scratch/groups/Projects/P1470/fsl/featout/R6307_FMRI_4.feat/BensonV1.nii.gz \
+  -ref /scratch/groups/Projects/P1470/fsl/featout/R6307_FMRI_4.feat/filtered_func_data.nii.gz \
+  -applyxfm -init /scratch/groups/Projects/P1470/fsl/featout/R6307_FMRI_4.feat/reg/highres2example_func.mat \
+  -interp nearestneighbour \
+  -o /scratch/groups/Projects/P1470/fsl/featout/R6307_FMRI_4.feat/Bensonv1_func.nii.gz

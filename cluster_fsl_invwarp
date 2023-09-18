@@ -11,6 +11,6 @@ while read rnum; do
     echo $frun
     # Modify the script in place
     sed -i -E "s/R[0-9]{4}_FMRI_[0-9]/${rnum}_FMRI_${frun}/g" fsl_invwarp
-    qsub -j y fsl_invwarp
+    qsub -j y -o /scratch/home/j/jtm545/logs fsl_invwarp
   done
 done < "$rnumbers"

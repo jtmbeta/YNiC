@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+# List the gfeat copes for a featquery
+
+ls -d -1 /scratch/groups/Projects/P1470/fsl/featout/*.feat
+ls -d -1 /scratch/groups/Projects/P1470/fsl/featout/*.feat > ../featquerycopes.txt
+
+

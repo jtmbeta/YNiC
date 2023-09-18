@@ -2,5 +2,7 @@
 
 # List the gfeat copes for a featquery
 
-ls -d /scratch/groups/Projects/P1470/fsl/featout/*I.gfeat/cope?.feat
+ls -d -1 /scratch/groups/Projects/P1470/fsl/featout/*I.gfeat/cope?.feat
+ls -d -1 /scratch/groups/Projects/P1470/fsl/featout/*I.gfeat/cope?.feat > ../gfeatquerycopes.txt
+
 

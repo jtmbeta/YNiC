@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+
+for ROI in SCN CSF V1; do
+
+featquery \
+  1 /scratch/groups/Projects/P1470/fsl/featout/R6307_FMRI_4.feat \
+  3 stats/pe1 stats/pe3 stats/pe5 \
+  featquery_"$ROI" \
+  "$ROI"_mask_func_bin.nii.gz
+done  

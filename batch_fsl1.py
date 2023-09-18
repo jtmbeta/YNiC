@@ -37,7 +37,7 @@ FMRI_BET = 1
 
 
 # Set to False to run the full analysis, including registration
-ONLYSTATS = False
+ONLYSTATS = True
 
 # FEAT options
 # If running an analysis with different options, add the following suffix
