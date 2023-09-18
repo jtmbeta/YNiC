@@ -6,7 +6,7 @@ Experiment scripts and analysis code from YNiC projects `P1459` and `P1470` (see
 
 Here's a neat way of using the YNiC cluster. It works well for pretty much any task, but is ideally suited to repetitive tasks that make use of neuroimaging command line tools and take a while to complete.
 
-As an example, suppose you want to use the FSL command line tools to warp a mask back from standard space into functional space for many individual scans, but you do not have the inverse of the non-linear `transform highres2standard_warp` volume ([the problem described here](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FNIRT/UserGuide#Transforming_an_image_.28.27.27e.g..27.27_a_mask.29_in_standard_space_into_functional_space)). The script to create this volume for an individual scan would look something like this:
+As an example, suppose you want to use the FSL command line tools to warp a mask back from standard space into functional space for many individual scans, but you do not have the inverse of the non-linear transform `highres2standard_warp` volume ([the problem described here](https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FNIRT/UserGuide#Transforming_an_image_.28.27.27e.g..27.27_a_mask.29_in_standard_space_into_functional_space)). The script to create this volume for an individual scan would look something like this:
 
 ```bash
 #!/usr/bin/env bash
